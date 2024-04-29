@@ -1,0 +1,204 @@
+/**
+* @file
+* Global utilities.
+*
+*/
+(function($, Drupal) {
+
+  'use strict';
+
+  Drupal.behaviors.fortra_parent_2022 = {
+    attach: function(context, settings) {
+      $(document).ready(function() {
+        resizeTabs();
+        resizeCards();
+        updateAnchorNavPosition();
+      });
+      $(window).resize(function() {
+        resizeTabs();
+        resizeCards();
+        updateAnchorNavPosition();
+      })
+      $('.tabbed-accordion .tab-content').on('shown.bs.collapse', function(e) {
+        resizeTabs();
+      });
+      $('.popup-window', context).click(function() {
+        var window_width = $(this).data("window-width"),
+        window_height = $(this).data("window-height"),
+        window_name = $(this).data("name"),
+        left = (screen.width / 2) - (window_width / 2),
+        top = (screen.height / 2) - (window_height / 2) - 20;
+
+        window.open(this.href, window_name, 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=yes, copyhistory=no, width=' + window_width + ', height=' + window_height + ', top=' + top + ', left=' + left);
+        return false;
+      });
+    }
+  };
+
+  function resizeTabs() {
+    var windowSize = $(window).width();
+    if (windowSize > 1024) {
+      $('.tabbed-accordion').each(function() {
+        var height = $('.tab-content.show', this).height();
+        $(this).css('min-height', height);
+      });
+    }
+  }
+
+  function resizeCards() {
+    var windowSize = $(window).width();
+    if (windowSize > 1024) {
+      $('.card-list-items').each(function() {
+        // Define Heights Variable
+        var heights = [];
+
+        // Loop Through Card Footers and get height
+        $('.card .card-footer', this).each(function() {
+          heights.push($(this).outerHeight());
+        });
+        // Debug heights array alert(heights.toString());
+        var height = Math.max.apply(Math, heights);
+
+        // Make all card footers equal height
+        $('.card .card-footer', this).css('min-height', height);
+      });
+    }
+  }
+  $(document).ready(function() {
+    updateAnchorNavPosition();
+  });
+
+  $(window).resize(function() {
+    updateAnchorNavPosition();
+  })
+
+  function updateAnchorNavPosition() {
+    var windowSize = $(window).width();
+    if (windowSize > 768) {
+      var headerOffset = $('#header').offset().top - $(window).scrollTop();
+      var headerHeight = $('#header').outerHeight();
+      var headerBottom = headerOffset + headerHeight;
+      $('.anchor-nav').css('top', headerBottom)
+    } else {
+      $('.anchor-nav').css({top: ''});
+    }
+  }
+
+  // Menu search block.
+  Drupal.behaviors.menuSearch = {
+    attach: function(context, settings) {
+      var searchBlock = $('#block-exposed-site-search', context);
+      var searchForm = $('.searchbar-form', searchBlock);
+      var searchInput = $('.form-text', searchForm);
+      var searchIcon = $('.searchbar-icon', searchBlock);
+      var navbar = $('.header-primary', context);
+
+      searchIcon.on('click', function() {
+        navbar.addClass('position-relative');
+        searchBlock.addClass('searchbar-open');
+        searchInput.trigger('focus');
+      });
+      searchInput.on('focusout', function() {
+        navbar.removeClass('position-relative');
+        searchBlock.removeClass('searchbar-open');
+      });
+    }
+  };
+
+  Drupal.behaviors.video_transcript = {
+    attach: function(context, settings) {
+      $('.field--name-field-transcript .read-more a, .field--name-field-transcript .close-btn', context).once().click(function(e) {
+        e.preventDefault();
+        $(this).closest('.field--name-field-transcript').toggleClass('open');
+      });
+    }
+  };
+
+  // Remove collapsible from sidebar_second on tablet and above.
+  Drupal.behaviors.mobileFilter = {
+    attach: function(context, settings) {
+      var sidebar = $('.sidebar_second', context);
+
+      if (sidebar && sidebar.hasClass('collapse')) {
+        var windowSize = $(window).width();
+        if (windowSize > 575) {
+          sidebar.removeClass('collapse');
+        }
+      }
+    }
+  };
+
+  $('.stacktable').stacktable();
+  $(function() {
+    $('[data-toggle="popover"]').popover()
+  })
+
+  // Smooth scroll with offset.
+  $('a[href^="#"]:not([data-toggle])').on('click', function (e) {
+    var chatopen = false;
+
+    if($(this).hasClass('chat-open')){
+      chatopen = true;
+    }
+    // Make sure this.hash has a value before overriding default behavior
+    if (this.hash !== '' && chatopen == false) {
+      e.preventDefault();
+
+      var target = this.hash;
+      var $target = $(target);
+
+      var offset = $(window).width() < 768 ? 112 : 144;
+      if ($('body').hasClass('toolbar-horizontal') || $('body').hasClass('toolbar-vertical')) {
+        offset = offset + 39;
+      }
+      if ($('body').hasClass('toolbar-tray-open')) {
+        offset = offset + 40;
+      }
+
+      if($target.length){
+        $('html, body').stop().animate({
+          'scrollTop': $target.offset().top - offset,
+        }, 300, function () {
+          window.history.pushState({}, '', target);
+        });
+      }
+    }
+  });
+
+  if (typeof MktoForms2 !== 'undefined') {
+    MktoForms2.whenReady(function(form){
+
+      var formEl = form.getFormElem()[0];
+      formEl.removeAttribute("style");
+      destyleMktoForm(form);
+
+      var form_attributes = "font-size:400;" ;
+      formEl.setAttribute("style", form_attributes );
+
+    });
+  }
+
+  function destyleMktoForm(mktoForm, moreStyles){
+    var formEl = mktoForm.getFormElem()[0],
+      arrayify = getSelection.call.bind([].slice);
+
+    // remove element styles from <form> and children
+    var styledEls = arrayify(formEl.querySelectorAll("[style]")).concat(formEl);
+    styledEls.forEach(function(el) {
+      el.removeAttribute("style");
+    });
+
+    // disable remote stylesheets and local <style>s
+    var styleSheets = arrayify(document.styleSheets);
+    styleSheets.forEach(function(ss) {
+      if ( [mktoForms2BaseStyle,mktoForms2ThemeStyle].indexOf(ss.ownerNode) != -1 || formEl.contains(ss.ownerNode) ) {
+        ss.disabled = true;
+      }
+    });
+
+     if(!moreStyles) {
+        formEl.setAttribute("data-styles-ready", "true");
+     }
+  };
+
+})(jQuery, Drupal);

@@ -1,0 +1,33 @@
+(function ($) {
+  $(document).ready(function(){
+    $('.collapse').on('shown.bs.collapse', function () {
+      $(this).parent().find(".fa").removeClass("fa-plus").addClass("fa-minus");
+    }).on('hidden.bs.collapse', function(){
+      $(this).parent().find(".fa").removeClass("fa-minus").addClass("fa-plus");
+    });
+
+    $('.faq-accordion .card .collapse').on('show.bs.collapse', function () {
+      $('.faq-accordion .card .collapse.show').each(function() {
+        $(this).collapse('hide');
+      });
+    });
+
+    $('.faq-accordion .card .collapse').on('hide.bs.collapse', function (e) {
+      if($(this).hasClass('show')) {
+        e.preventDefault();
+      }
+    });
+
+    $('.faq-accordion .card').on('click', function (e) {
+      const parentCard = $(e.target).closest('.card');
+      const btn = $(e.target).closest('.btn');
+      const collapseElement = parentCard.find('.collapse');
+
+      btn.toggleClass('collapsed');
+
+      if (collapseElement.hasClass('show')) {
+        collapseElement.toggle('show');
+      }
+    });
+  });
+}(jQuery));

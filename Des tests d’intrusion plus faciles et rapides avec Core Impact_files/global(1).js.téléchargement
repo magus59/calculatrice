@@ -1,0 +1,48 @@
+/**
+* @file
+* Global utilities.
+*
+*/
+(function($, Drupal) {
+
+  'use strict';
+
+  Drupal.behaviors.menuProductFilter = {
+    attach: function(context, settings) {
+      var search = $('#product-search', context);
+      var view = $('#block-views-blockall-products-block-1', context);
+      var productLines = $('.view-group > h3', view);
+      var products = $('[data-filter]', view);
+
+      search.on('keyup', function() {
+        var value = $(this).val().toLowerCase();
+        if (value === '') {
+          // Reset the display.
+          $('.view-grouping', view).collapse('hide');
+          productLines.show();
+        }
+        else {
+          products.filter(function() {
+            // Toggle Product visibility of matched search text.
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+          });
+
+          $('.view-grouping', view).collapse('show');
+          productLines.filter(function() {
+            // If search match the product line title.
+            var filteredTitle = $(this).text().toLowerCase().indexOf(value) > -1;
+            var visibleChild = false;
+            // If any of its child matched the search, ie. visible.
+            $(this).next('.view-grouping').find('a').each(function() {
+              if ($(this).css('display') !== 'none') {
+                visibleChild = true;
+              }
+            });
+            $(this).parent('.view-group').toggle(filteredTitle || visibleChild);
+          });
+        }
+      });
+    }
+  };
+
+})(jQuery, Drupal);

@@ -1,0 +1,49 @@
+
+/**
+ * Grab data attribute objects with vanilla JavaScript (ES6)
+ */
+ (function ($) {
+document.addEventListener('DOMContentLoaded', () => {
+  function widget(Product){
+    // add widget id and product name to widgetProducts 
+    const widgetProducts ={
+      Automate: "ZjQ3ZmZmNTUtNmJlOC00ZjM0LTlmZDMtZTdiNTY4MmJjNThm",
+    };
+    // if product is available in the widgetProduct key value pair
+    let widgetID = "ZjQ3ZmZmNTUtNmJlOC00ZjM0LTlmZDMtZTdiNTY4MmJjNThm"; 
+    if (Product in widgetProducts){
+      widgetID = widgetProducts[Product];
+    }
+    return widgetID;
+  }
+
+
+ const entryInfoElements = document.querySelectorAll('[data-entry-info]');
+  if (entryInfoElements){
+    // Map over each element and extract the data value
+    const entryInfoObjects =
+    Array.from(entryInfoElements).map(
+        item => JSON.parse(item.dataset.entryInfo)
+    );
+     
+    if (Array.isArray(entryInfoObjects) && entryInfoObjects.length){
+      const Product = entryInfoObjects[0].productName;
+      GartnerPI_Widget({
+        size: "line",
+        theme: "light",
+        sourcingLink: "",
+        widget_id: widget(Product),
+        container: document.getElementById("widget-container")
+      })
+    }else{
+      GartnerPI_Widget({
+        size: "line",
+        theme: "light",
+        sourcingLink: "",
+        widget_id: "ZjQ3ZmZmNTUtNmJlOC00ZjM0LTlmZDMtZTdiNTY4MmJjNThm",
+        container: document.getElementById("widget-container")
+      })
+    }
+  }  
+});
+}(jQuery));
